@@ -3,6 +3,7 @@ package xyz.destiall.sgames.match.events;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import xyz.destiall.sgames.match.Match;
+import xyz.destiall.sgames.player.Competitor;
 
 public class MatchFinishEvent extends Event {
     private final Match match;
@@ -12,6 +13,10 @@ public class MatchFinishEvent extends Event {
 
     public Match getMatch() {
         return match;
+    }
+
+    public Competitor getWinner() {
+        return match.getWinner();
     }
 
     private static final HandlerList handlers=new HandlerList();

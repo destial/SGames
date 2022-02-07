@@ -15,6 +15,7 @@ public enum MessageKey {
     GAME_FULL("messages.full", "&cThe game is already full!"),
     SPECTATE_PREFIX("messages.spectate-prefix", "&7[SPECTATING] "),
     TIME_REMAINING("messages.time-remaining", "&aTime Remaining: &e{time}"),
+    WINNER("messages.winner", "&a{winner} has won the &6Hunger Games!"),
     UNKNOWN("messages.unknown", "Unknown"),
 
     UNIT_SECOND("messages.duration.second", "s"),

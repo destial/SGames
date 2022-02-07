@@ -37,6 +37,7 @@ import xyz.destiall.sgames.player.modules.BossBarModule;
 import xyz.destiall.sgames.player.modules.DeathModule;
 import xyz.destiall.sgames.player.modules.ScoreboardModule;
 import xyz.destiall.sgames.player.modules.SpectateModule;
+import xyz.destiall.sgames.utils.FormatUtils;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -173,18 +174,28 @@ public class Match implements Module {
         }
     }
 
-    public void calculateDMConditions() {
+    public boolean calculateDMConditions() {
         boolean dm = isRunning() && (competitors.size() <= SGames.INSTANCE.getConfigManager().getInt(ConfigKey.MIN_DEATHMATCH) || countdown.getContext() == Countdown.Context.RUNNING && countdown.getRemaining().isZero());
         if (dm) {
             countdown.setDuration(Duration.of(30, ChronoUnit.SECONDS));
+
+            if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.DEATHMATCH_NIGHT)) {
+                getWorld().setTime(12000);
+            }
         }
+        return dm;
     }
 
-    public void calculateWinConditions() {
+    public boolean calculateWinConditions() {
         boolean win = isRunning() && (competitors.size() <= 1 || countdown.getContext() == Countdown.Context.DEATHMATCH && countdown.getRemaining().isZero());
         if (win) {
             countdown.setContext(Countdown.Context.FINISHING);
+            state = State.FINISHING;
             callEvent(new MatchFinishEvent(this));
+
+            String winner = SGames.INSTANCE.getConfigManager().getMessage(MessageKey.WINNER);
+            winner = FormatUtils.formatMatch(winner, this);
+            broadcast(winner);
 
             if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.WIN_FIREWORKS)) {
                 FireworkEffect effect = FireworkEffect.builder().trail(true).withColor(Color.YELLOW).with(FireworkEffect.Type.STAR).build();
@@ -194,8 +205,7 @@ public class Match implements Module {
                     meta.addEffect(effect);
                 }
                 if (competitors.size() == 1) {
-                    Competitor competitor = competitors.values().stream().findFirst().get();
-
+                    Competitor competitor = getWinner();
                     for (double theta = -Math.PI; theta <= Math.PI; theta += Math.PI / 6) {
                         double x = Math.cos(theta);
                         double z = Math.sin(theta);
@@ -206,10 +216,12 @@ public class Match implements Module {
                     }
                 }
             }
+
             if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.WIN_NIGHT)) {
                 getWorld().setTime(12000);
             }
         }
+        return win;
     }
 
     public World getWorld() {
@@ -254,6 +266,10 @@ public class Match implements Module {
     public SGPlayer getPlayer(UUID uuid) {
         SGPlayer player = getCompetitor(uuid);
         return player != null ? player : getSpectator(uuid);
+    }
+
+    public Competitor getWinner() {
+        return competitors.size() != 1 ? null : competitors.values().stream().findFirst().get();
     }
 
     public void forEachPlayer(Consumer<SGPlayer> consumer) {

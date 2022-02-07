@@ -24,6 +24,7 @@ import xyz.destiall.sgames.config.MessageKey;
 import xyz.destiall.sgames.match.Match;
 import xyz.destiall.sgames.player.Competitor;
 import xyz.destiall.sgames.player.events.CompetitorDeathEvent;
+import xyz.destiall.sgames.utils.FormatUtils;
 import xyz.destiall.sgames.utils.SoundUtils;
 
 public class DeathModule implements Module, Listener {
@@ -125,17 +126,18 @@ public class DeathModule implements Module, Listener {
         p.reset();
 
         if (p.getBukkit().isPresent()) {
+            String dead = FormatUtils.formatMatchPlayer(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.DIED), p.getBukkit().get(), match);
             if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.KICK_ON_DEATH)) {
-                p.kick(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.DIED));
+                p.kick(dead);
                 p.setBukkit(null);
             } else {
-                p.sendMessage(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.DIED));
+                p.sendMessage(dead);
                 match.addSpectator(p.getBukkit().get(), false);
             }
         }
 
+        if (match.calculateWinConditions()) return;
         match.calculateDMConditions();
-        match.calculateWinConditions();
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -33,6 +33,12 @@ public class BossBarModule implements Module, Tickable {
         if (countdown.getDuration().getSeconds() != 0) {
             progress = countdown.getRemaining().getSeconds() / (float) countdown.getDuration().getSeconds();
         }
+        String message = this.message;
+        if (countdown.getContext() == Countdown.Context.GRACE) {
+            message = SGames.INSTANCE.getConfigManager().getMessage(MessageKey.GRACE_PERIOD);
+        } else if (countdown.getContext() == Countdown.Context.STARTING) {
+            message = SGames.INSTANCE.getConfigManager().getMessage(MessageKey.STARTING);
+        }
         bar = bar.name(Component.text(FormatUtils.formatMatch(message, match))).progress(progress)
                  .color(progress > 0.6f ? BossBar.Color.GREEN : progress > 0.3f ? BossBar.Color.YELLOW : BossBar.Color.RED);
 

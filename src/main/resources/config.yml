@@ -81,6 +81,7 @@ messages:
   game-started: "&cThe game has already started!"
   full: "&cThe game is already full!"
   spectate-prefix: "&7[SPECTATING] "
+  winner: "&a{winner} has won the &6Hunger Games!"
   time-remaining: "&aTime Remaining: &e{time}"
   unknown: "Unknown"
 

@@ -8,6 +8,7 @@ import xyz.destiall.sgames.lobby.Lobby;
 import xyz.destiall.sgames.manager.MatchManager;
 import xyz.destiall.sgames.map.MapInfo;
 import xyz.destiall.sgames.match.Match;
+import xyz.destiall.sgames.player.Competitor;
 import xyz.destiall.sgames.player.Spectator;
 import xyz.destiall.sgames.player.modules.SpectateModule;
 
@@ -19,6 +20,10 @@ public class FormatUtils {
     private FormatUtils() {}
 
     public static String formatMatch(String line, Match match) {
+        if (match.isFinishing()) {
+            Competitor winner = match.getWinner();
+            line = line.replace("{winner}", winner != null ? winner.getName() : "Unknown");
+        }
         return line.replace("{alive}", "" + match.getAlive())
                 .replace("{spectating}", "" + match.getSpectating())
                 .replace("{time}", match.getCountdown().getFormattedDuration())
@@ -27,13 +32,13 @@ public class FormatUtils {
 
     public static String formatPlayer(String line, Player player) {
         Location location = player.getLocation();
-        return line.replace("{player}", player.getName())
+        return SGames.INSTANCE.getConfigManager().papi(line.replace("{player}", player.getName())
                 .replace("{health}", "" + player.getHealth())
                 .replace("{hunger}", "" + player.getFoodLevel())
                 .replace("{x}", "" + location.getBlockX())
                 .replace("{y}", "" + location.getBlockY())
                 .replace("{z}", "" + location.getBlockZ())
-                .replace("{direction}", "" + getCardinal(location));
+                .replace("{direction}", "" + getCardinal(location)), player);
     }
 
     public static String formatMatchPlayer(String line, Player player, Match match) {
@@ -41,7 +46,9 @@ public class FormatUtils {
         SpectateModule m = match.getModule(SpectateModule.class);
         if (m != null && m.isSpectating(player.getUniqueId())) {
             Spectator spectator = match.getSpectator(player.getUniqueId());
-            p = spectator.getBukkit().get();
+            if (spectator != null && spectator.getBukkit().isPresent()) {
+                p = spectator.getBukkit().get();
+            }
         }
         return formatMatch(formatPlayer(line, p), match);
     }

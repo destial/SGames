@@ -19,6 +19,7 @@ import xyz.destiall.sgames.countdown.Countdown;
 import xyz.destiall.sgames.countdown.events.CountdownEndEvent;
 import xyz.destiall.sgames.lobby.events.QueueRemoveEvent;
 import xyz.destiall.sgames.lobby.events.ReadyToStartEvent;
+import xyz.destiall.sgames.match.events.MatchInitEvent;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
@@ -125,6 +126,7 @@ public class Lobby implements Module, Listener, Tickable {
             for (Player player : queue()) {
                 player.addPotionEffect(PotionEffectType.BLINDNESS.createEffect(1000, 1));
             }
+            callEvent(new MatchInitEvent(this));
             try {
                 SGames.INSTANCE.getMatchManager().loadMatchAsync().get();
             } catch (Exception ex) {

@@ -17,7 +17,6 @@ import xyz.destiall.sgames.map.MapInfo;
 import xyz.destiall.sgames.match.Match;
 import xyz.destiall.sgames.match.MatchFactory;
 import xyz.destiall.sgames.match.MatchLoader;
-import xyz.destiall.sgames.match.events.MatchInitEvent;
 import xyz.destiall.sgames.match.events.MatchLoadEvent;
 import xyz.destiall.sgames.utils.FileUtils;
 
@@ -53,7 +52,6 @@ public class MatchManager implements Module, Listener {
         if (match == null) {
             MapInfo mostVoted = voteManager.getVotedMap();
             if (mostVoted == null) return null;
-            callEvent(new MatchInitEvent(lobby, mostVoted));
             voteManager.unload();
             return new MatchLoader(new MatchFactory(lobby, mostVoted));
         }

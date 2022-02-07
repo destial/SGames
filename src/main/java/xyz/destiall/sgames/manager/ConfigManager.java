@@ -1,7 +1,9 @@
 package xyz.destiall.sgames.manager;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.config.ConfigKey;
 import xyz.destiall.sgames.config.MessageKey;
@@ -72,5 +74,12 @@ public class ConfigManager {
             e.printStackTrace();
         }
         return Duration.of(i, unit);
+    }
+
+    public String papi(String line, Player player) {
+        if (PAPI) {
+            return PlaceholderAPI.setPlaceholders(player, line);
+        }
+        return line;
     }
 }
