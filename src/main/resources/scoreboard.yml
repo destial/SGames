@@ -1,0 +1,45 @@
+# Global placeholders:
+# {player} = player name
+# {x} {y} {z} = player location
+# {direction} = player cardinal direction (e.g. N, NE, S, SW)
+# {health} = player health
+# {hunger} = player hunger
+# {time} = remaining time (e.g. 29m)
+#
+# PlaceholderAPI also available if installed
+
+# Game placeholders:
+# {map} = map name
+# {alive} = number of remaining players
+# {spectating} = number of spectators
+
+game:
+  title: "{map}"
+  footer: "&eplay.sgcraft.net"
+  lines:
+    - ""
+    - ""
+    - "&aAlive: {alive}"
+    - "&7Spectators: {spectating}"
+    - ""
+    - ""
+    - "&6Time: {time}"
+
+# Lobby placeholders:
+# {queue} = current number of players in the queue
+# {max} = maximum amount of players
+# {min} = minimum players needed to start
+# {map1}, {map2}, {map3}... = maps in the vote
+# {votes1}, {votes2}, {votes3}... = number of votes for the corresponding maps
+lobby:
+  title: "Lobby"
+  footer: "&eplay.sgcraft.net"
+  lines:
+    - ""
+    - "&aPlayers: {queue} / {max}"
+    - "&aNeeded: {min}"
+    - ""
+    - "&5{map1}: {votes1}"
+    - "&d{map2}: {votes2}"
+    - ""
+    - "&6Time: {time}"
