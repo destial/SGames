@@ -58,7 +58,7 @@ public class DeathModule implements Module, Listener {
             e.setCancelled(true);
             player.setHealth(20);
             if (e.getCause() == EntityDamageEvent.DamageCause.VOID) {
-                player.teleport(match.getMap().getFirstSpawnPoint().getLocation());
+                player.teleport(match.getMap().getCenter());
             }
             return;
         }

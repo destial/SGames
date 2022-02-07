@@ -1,6 +1,7 @@
 package xyz.destiall.sgames.map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.api.Module;
@@ -15,14 +16,17 @@ public class Map implements Module {
     private final List<SpawnPoint> points;
     private final MapInfo mapInfo;
     private final World world;
+    private final Location center;
 
     public Map(MapInfo mapInfo, World world) {
         this.mapInfo = mapInfo;
         this.world = world;
-        points = mapInfo.getSpawnPoints().stream().map(SpawnPoint::clone).collect(Collectors.toList());
+        this.points = mapInfo.getSpawnPoints().stream().map(SpawnPoint::clone).collect(Collectors.toList());
         if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.RANDOM_SPAWNPOINT)) {
             Collections.shuffle(points);
         }
+        this.center = mapInfo.getCenter().clone();
+        this.center.setWorld(world);
         for (SpawnPoint sp : points) {
             sp.getLocation().setWorld(world);
             this.world.loadChunk(sp.getLocation().getBlockX(), sp.getLocation().getBlockZ(), true);
@@ -58,7 +62,7 @@ public class Map implements Module {
         return points.iterator();
     }
 
-    public SpawnPoint getFirstSpawnPoint() {
-        return points.get(0);
+    public Location getCenter() {
+        return center;
     }
 }

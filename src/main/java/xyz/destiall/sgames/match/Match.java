@@ -30,6 +30,7 @@ import xyz.destiall.sgames.map.SpawnPoint;
 import xyz.destiall.sgames.match.events.MatchFinishEvent;
 import xyz.destiall.sgames.match.events.MatchLoadEvent;
 import xyz.destiall.sgames.match.events.MatchMoveEvent;
+import xyz.destiall.sgames.match.modules.BorderModule;
 import xyz.destiall.sgames.player.Competitor;
 import xyz.destiall.sgames.player.Spectator;
 import xyz.destiall.sgames.player.modules.BlockModule;
@@ -80,6 +81,8 @@ public class Match implements Module {
     @Override
     public void load() {
         state = State.LOADING;
+
+        // Make sure countdown is always the first to tick
         countdown = new Countdown();
         tickables.add(countdown);
 
@@ -90,6 +93,10 @@ public class Match implements Module {
         modules.add(new DeathModule(this));
         modules.add(new BlockModule(this));
         modules.add(new BossBarModule(this));
+
+        if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.BORDER_ENABLED)) {
+            modules.add(new BorderModule(this));
+        }
 
         for (Module module : modules) {
             module.load();
@@ -170,7 +177,7 @@ public class Match implements Module {
         spectator.setGameMode(GameMode.SPECTATOR);
         sm.addPlayer(player);
         if (teleport) {
-            player.teleport(map.getFirstSpawnPoint().getLocation());
+            player.teleport(map.getCenter());
         }
     }
 
@@ -243,7 +250,7 @@ public class Match implements Module {
 
     public void teleport() {
         forEachCompetitor(Competitor::teleportToSpawnPoint);
-        Location spec = map.getFirstSpawnPoint().getLocation();
+        Location spec = map.getCenter();
         forEachSpectator(spectator -> spectator.teleport(spec));
     }
 

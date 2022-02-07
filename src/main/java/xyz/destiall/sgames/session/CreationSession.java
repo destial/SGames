@@ -4,6 +4,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.utils.FileUtils;
@@ -56,8 +60,12 @@ public class CreationSession {
     public boolean save() throws IOException {
         if (name == null) return false;
         if (spawnPoints.isEmpty()) return false;
-        world.save();
-
+        world.setAnimalSpawnLimit(0);
+        world.setMonsterSpawnLimit(0);
+        for (Entity e : world.getEntities()) {
+            if (e instanceof Player || e instanceof ItemFrame || e instanceof ArmorStand || e instanceof Minecart) continue;
+            e.remove();
+        }
         File mapYml = new File(world.getWorldFolder(), "map.yml");
         if (!mapYml.exists()) mapYml.createNewFile();
         YamlConfiguration config = YamlConfiguration.loadConfiguration(mapYml);
@@ -74,12 +82,15 @@ public class CreationSession {
         }
         config.set("spawnpoints", points);
         config.save(mapYml);
-        SESSIONS.remove(uuid);
 
         File mapsFolder = SGames.INSTANCE.getMapManager().getMapsFolder();
         File mapDst = new File(mapsFolder, name + File.separator);
         if (!mapDst.exists()) mapDst.mkdir();
+        else FileUtils.delete(mapDst);
+
+        world.save();
         FileUtils.copy(world.getWorldFolder(), mapDst, true);
-        return true;
+
+        return SESSIONS.remove(uuid) != null;
     }
 }
