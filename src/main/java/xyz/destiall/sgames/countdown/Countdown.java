@@ -28,7 +28,7 @@ public class Countdown implements Tickable {
     }
 
     public void setDuration(Duration duration) {
-        if (duration.getSeconds() >= this.remaining.getSeconds()) {
+        if (duration.getSeconds() < this.remaining.getSeconds()) {
             this.duration = duration;
             this.remaining = Duration.of(duration.getSeconds(), ChronoUnit.SECONDS);
         }

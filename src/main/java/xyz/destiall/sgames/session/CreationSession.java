@@ -91,6 +91,9 @@ public class CreationSession {
         world.save();
         FileUtils.copy(world.getWorldFolder(), mapDst, true);
 
+        File uid = new File(mapDst, "uid.dat");
+        if (uid.exists()) uid.delete();
+
         return SESSIONS.remove(uuid) != null;
     }
 }

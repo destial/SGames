@@ -2,11 +2,12 @@ package xyz.destiall.sgames.manager;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.config.ConfigKey;
 import xyz.destiall.sgames.config.MessageKey;
+import xyz.destiall.sgames.config.simpleconfig.SimpleConfig;
+import xyz.destiall.sgames.config.simpleconfig.SimpleConfigManager;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -14,42 +15,73 @@ import java.time.temporal.TemporalUnit;
 
 public class ConfigManager {
     private final SGames plugin;
-    private FileConfiguration configuration;
-    public boolean PAPI;
+    private final boolean PAPI;
+    private SimpleConfigManager scm;
+    private SimpleConfig configuration;
 
     public ConfigManager(SGames plugin) {
         this.plugin = plugin;
-        configuration = plugin.getConfig();
+        scm = new SimpleConfigManager(plugin);
+        configuration = scm.getNewConfig("config.yml", null, true);
         PAPI = plugin.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
     }
 
     public void reload() {
         plugin.reloadConfig();
-        configuration = plugin.getConfig();
+        scm = new SimpleConfigManager(plugin);
+        configuration = scm.getNewConfig("config.yml", null, true);
     }
 
     public boolean getBoolean(ConfigKey key) {
+        if (!configuration.contains(key.key)) {
+            configuration.set(key.key, key.def);
+            save();
+        }
         return configuration.getBoolean(key.key, (boolean) key.def);
     }
 
     public String getString(ConfigKey key) {
+        if (!configuration.contains(key.key)) {
+            configuration.set(key.key, key.def);
+            save();
+        }
         return configuration.getString(key.key, (String) key.def);
     }
 
     public String getMessage(MessageKey key) {
+        if (!configuration.contains(key.key)) {
+            configuration.set(key.key, key.def);
+            save();
+        }
         return ChatColor.translateAlternateColorCodes('&', configuration.getString(key.key, key.def));
     }
 
     public int getInt(ConfigKey key) {
+        if (!configuration.contains(key.key)) {
+            configuration.set(key.key, key.def);
+            save();
+        }
         return configuration.getInt(key.key, (int) key.def);
     }
 
     public double getDouble(ConfigKey key) {
+        if (!configuration.contains(key.key)) {
+            configuration.set(key.key, key.def);
+            save();
+        }
         return configuration.getDouble(key.key, (double) key.def);
     }
 
     public float getFloat(ConfigKey key) {
+        if (!configuration.contains(key.key)) {
+            configuration.set(key.key, key.def);
+            save();
+        }
         return (float) getDouble(key);
+    }
+
+    public void save() {
+        configuration.saveConfig();
     }
 
     public Duration getDuration(ConfigKey key) {

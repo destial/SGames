@@ -3,18 +3,24 @@ package xyz.destiall.sgames.player.modules;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -79,48 +85,121 @@ public class SpectateModule implements Module, Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void bed(PlayerBedEnterEvent e) {
         if (viewing.containsKey(e.getPlayer().getUniqueId())) e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void bed(PlayerBedLeaveEvent e) {
         if (viewing.containsKey(e.getPlayer().getUniqueId())) e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void inventory(InventoryInteractEvent e) {
-        if (viewing.containsKey(e.getWhoClicked().getUniqueId())) e.setCancelled(true);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void click(InventoryClickEvent e) {
+        inventory(e);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void drag(InventoryDragEvent e) {
+        inventory(e);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void inventory(InventoryInteractEvent e) {
+        if (viewing.containsKey(e.getWhoClicked().getUniqueId())) {
+            e.setCancelled(true);
+            return;
+        }
+        for (Map.Entry<UUID, Competitor> entry : viewing.entrySet()) {
+            if (entry.getValue().getId().equals(e.getWhoClicked().getUniqueId())) {
+                Spectator spectator = match.getSpectator(entry.getKey());
+                if (spectator == null) continue;
+                if (spectator.getBukkit().isPresent()) {
+                    spectator.copyInventory(entry.getValue().getInventory());
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void pick(EntityPickupItemEvent e) {
+        if (e.getEntity() instanceof Player) {
+            if (viewing.containsKey(e.getEntity().getUniqueId())) {
+                e.setCancelled(true);
+                return;
+            }
+            for (Map.Entry<UUID, Competitor> entry : viewing.entrySet()) {
+                if (entry.getValue().getId().equals(e.getEntity().getUniqueId())) {
+                    Spectator spectator = match.getSpectator(entry.getKey());
+                    if (spectator == null) continue;
+                    if (spectator.getBukkit().isPresent()) {
+                        spectator.copyInventory(entry.getValue().getInventory());
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void drop(PlayerDropItemEvent e) {
+        if (match.getSpectator(e.getPlayer().getUniqueId()) != null) {
+            e.setCancelled(true);
+            return;
+        }
+        for (Map.Entry<UUID, Competitor> entry : viewing.entrySet()) {
+            if (entry.getValue().getId().equals(e.getPlayer().getUniqueId())) {
+                Spectator spectator = match.getSpectator(entry.getKey());
+                if (spectator == null) continue;
+                if (spectator.getBukkit().isPresent()) {
+                    spectator.copyInventory(entry.getValue().getInventory());
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void projectile(ProjectileLaunchEvent e) {
+        if (e.getEntity().getShooter() instanceof Player) {
+            Player player = (Player) e.getEntity().getShooter();
+            if (match.getSpectator(player.getUniqueId()) != null) {
+                e.setCancelled(true);
+                return;
+            }
+            for (Map.Entry<UUID, Competitor> entry : viewing.entrySet()) {
+                if (entry.getValue().getId().equals(player.getUniqueId())) {
+                    Spectator spectator = match.getSpectator(entry.getKey());
+                    if (spectator == null) continue;
+                    if (spectator.getBukkit().isPresent()) {
+                        spectator.copyInventory(entry.getValue().getInventory());
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void damage(EntityDamageEvent e) {
         if (viewing.containsKey(e.getEntity().getUniqueId())) e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void damageEntity(EntityDamageByEntityEvent e) {
-        if (viewing.containsKey(e.getDamager().getUniqueId())) e.setCancelled(true);
+        if (match.getSpectator(e.getDamager().getUniqueId()) != null) e.setCancelled(true);
         damage(e);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void damageBlock(EntityDamageByBlockEvent e) {
         damage(e);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void swap(PlayerSwapHandItemsEvent e) {
         if (viewing.containsKey(e.getPlayer().getUniqueId())) e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void drop(PlayerDropItemEvent e) {
-        if (match.getSpectator(e.getPlayer().getUniqueId()) != null) e.setCancelled(true);
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void hotbar(PlayerItemHeldEvent e) {
         if (viewing.containsKey(e.getPlayer().getUniqueId())) {
             e.setCancelled(true);
@@ -163,32 +242,49 @@ public class SpectateModule implements Module, Listener {
         }
     }
 
+    @EventHandler
+    public void eat(PlayerItemConsumeEvent e) {
+        if (match.getSpectator(e.getPlayer().getUniqueId()) != null) {
+            e.setCancelled(true);
+            return;
+        }
+        for (Map.Entry<UUID, Competitor> entry : viewing.entrySet()) {
+            if (entry.getValue().getId().equals(e.getPlayer().getUniqueId())) {
+                Spectator spectator = match.getSpectator(entry.getKey());
+                if (spectator == null) continue;
+                if (spectator.getBukkit().isPresent()) {
+                    spectator.copyInventory(entry.getValue().getInventory());
+                }
+            }
+        }
+    }
+
     public void spectate(Spectator spectator, Competitor competitor) {
         if (viewing.containsKey(spectator.getId())) {
             unspectate(spectator.getId());
         }
         viewing.put(spectator.getId(), competitor);
         spectator.setGameMode(GameMode.ADVENTURE);
-        // spectator.setInvisible();
+        spectator.copyInventory(competitor.getInventory());
         spectator.copyEffects(competitor);
         spectator.hide(competitor);
         match.forEachSpectator((s) -> {
             if (s == spectator) return;
             s.hide(spectator);
         });
-        spectator.showTitle(Component.text("Spectating " + competitor.getName(), TextColorUtils.GRAY));
+        spectator.showTitle(Component.text("Spectating", TextColorUtils.GRAY), Component.text(competitor.getName(), TextColorUtils.GRAY));
     }
 
     public void unspectate(UUID uuid) {
-        Competitor spectating = viewing.remove(uuid);
-        if (spectating != null) {
+        Competitor competitor = viewing.remove(uuid);
+        if (competitor != null) {
             Spectator spectator = match.getSpectator(uuid);
             if (spectator == null) return;
             spectator.clearInventory();
             spectator.clearEffects();
             spectator.setGameMode(GameMode.SPECTATOR);
-            spectator.unhide(spectating);
-            spectator.showTitle(Component.text("Exiting " + spectating.getName(), TextColorUtils.GRAY));
+            spectator.unhide(competitor);
+            spectator.showTitle(Component.text("Exiting", TextColorUtils.GRAY), Component.text(competitor.getName(), TextColorUtils.GRAY));
         }
     }
 
@@ -205,11 +301,12 @@ public class SpectateModule implements Module, Listener {
         for (Map.Entry<UUID, Competitor> entry : viewing.entrySet()) {
             Spectator spectator = match.getSpectator(entry.getKey());
             if (spectator == null) continue;
-            spectator.copyInventory(entry.getValue().getInventory());
-            spectator.setHealth(entry.getValue().getHealth());
-            spectator.setHunger(entry.getValue().getHunger());
+            // spectator.copyInventory(entry.getValue().getInventory());
             Location to = entry.getValue().getLocation().clone();
             spectator.teleport(to);
+            spectator.copyVelocity(entry.getValue().getVelocity());
+            spectator.setHealth(entry.getValue().getHealth());
+            spectator.setHunger(entry.getValue().getHunger());
         }
     }
 }

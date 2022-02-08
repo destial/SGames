@@ -1,9 +1,9 @@
 # Global placeholders:
-# {player} = player name
-# {x} {y} {z} = player location
-# {direction} = player cardinal direction (e.g. N, NE, S, SW)
-# {health} = player health
-# {hunger} = player hunger
+# {game} = game name
+# {x} {y} {z} = game location
+# {direction} = game cardinal direction (e.g. N, NE, S, SW)
+# {health} = game health
+# {hunger} = game hunger
 # {time} = remaining time (e.g. 29m)
 #
 # PlaceholderAPI also available if installed

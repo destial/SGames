@@ -14,6 +14,7 @@ import xyz.destiall.sgames.countdown.events.CountdownCallEvent;
 import xyz.destiall.sgames.countdown.events.CountdownEndEvent;
 import xyz.destiall.sgames.manager.ConfigManager;
 import xyz.destiall.sgames.match.Match;
+import xyz.destiall.sgames.match.events.DeathmatchEvent;
 import xyz.destiall.sgames.match.events.GraceEndEvent;
 import xyz.destiall.sgames.match.events.MatchStartEvent;
 import xyz.destiall.sgames.utils.SoundUtils;
@@ -26,7 +27,7 @@ public class CountdownModule implements Module, Listener {
     }
 
     @EventHandler
-    public void onCountdownEnd(CountdownEndEvent e) {
+    public void countdownEnd(CountdownEndEvent e) {
         if (e.getCountdown() != match.getCountdown()) return;
         Countdown.Context newContext;
         ConfigManager cm = SGames.INSTANCE.getConfigManager();
@@ -40,8 +41,9 @@ public class CountdownModule implements Module, Listener {
                 match.callEvent(new GraceEndEvent(match));
                 break;
             case RUNNING:
-                match.teleport();
                 newContext = Countdown.Context.STARTING_DM;
+                match.teleport();
+                match.callEvent(new DeathmatchEvent(match));
                 break;
             case STARTING_DM:
                 newContext = Countdown.Context.DEATHMATCH;
@@ -62,18 +64,7 @@ public class CountdownModule implements Module, Listener {
     }
 
     @EventHandler
-    public void onMatchStart(MatchStartEvent e) {
-        match.broadcast(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.START));
-        match.forEachPlayer((p) -> p.playSound(SoundUtils.of(Sound.ENTITY_WITHER_SPAWN, 1, 1)));
-    }
-
-    @EventHandler
-    public void onGraceEnd(GraceEndEvent e) {
-        match.broadcast(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.GRACE_PERIOD_END));
-    }
-
-    @EventHandler
-    public void onCountdownCall(CountdownCallEvent e) {
+    public void countdownCall(CountdownCallEvent e) {
         if (e.getRemaining().getSeconds() <= 5) {
             long seconds = e.getRemaining().getSeconds();
             if (e.getContext() == Countdown.Context.STARTING || e.getContext() == Countdown.Context.STARTING_DM) {
@@ -83,4 +74,16 @@ public class CountdownModule implements Module, Listener {
             }
         }
     }
+
+    @EventHandler
+    public void matchStart(MatchStartEvent e) {
+        match.broadcast(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.START));
+        match.forEachPlayer((p) -> p.playSound(SoundUtils.of(Sound.ENTITY_WITHER_SPAWN, 1, 1)));
+    }
+
+    @EventHandler
+    public void graceEnd(GraceEndEvent e) {
+        match.broadcast(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.GRACE_PERIOD_END));
+    }
+
 }

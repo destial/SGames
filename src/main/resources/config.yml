@@ -1,9 +1,11 @@
+config-version: 1.0.1
+
 # Chest config
-# probability: More chances of reaching max-contents filled
+# probability = More chances of reaching max-contents filled
 #
-# max-contents: Maximum number of *slots* filled in a chest (this applies to double chest), not amount of items
-# min-contents: Minimum number of *slots* filled in a chest (this applies to double chest), not amount of items
-# keep-open: Keep a chest open after opening it for the first time
+# max-contents = Maximum number of *slots* filled in a chest (this applies to double chest), not amount of items
+# min-contents = Minimum number of *slots* filled in a chest (this applies to double chest), not amount of items
+# keep-open = Keep a chest open after opening it for the first time
 chest:
   probability: 12
   max-contents: 6
@@ -17,11 +19,11 @@ border:
   size: 500
 
 # Player config
-# min-players: Minimum players to start game
-# max-players: Maximum players to allow join
-# kick-on-death: Kick players on death.
-# allow-spectators: Allow spectators to join the match after it started.
-# min-deathmatch: Minimum players required to trigger deathmatch.
+# min-players = Minimum players to start game
+# max-players = Maximum players to allow join
+# kick-on-death = Kick players on death.
+# allow-spectators = Allow spectators to join the match after it started.
+# min-deathmatch = Minimum players required to trigger deathmatch.
 players:
   min-players: 3
   max-players: 24
@@ -30,29 +32,29 @@ players:
   min-deathmatch: 3
 
 # Duration config
-# starting: Duration for lobby, pre-game and pre-deathmatch.
-# grace-period: Duration for grace period.
-# running: Duration for normal game until deathmatch
-# deathmatch: Duration of deathmatch until game finishes.
-# finishing: Duration before closing the server
+# starting = Duration for lobby, pre-game and pre-deathmatch.
+# grace-period = Duration for grace period.
+# running = Duration for normal game until deathmatch
+# deathmatch = Duration of deathmatch until game finishes.
+# finishing = Duration before closing the server
 duration:
-  starting: 20s
-  grace-period: 10s
-  running: 30m
+  starting: 25s
+  grace-period: 15s
+  running: 20m
   deathmatch: 10m
   finishing: 10s
   unknown: 0s
 
 # Spawnpoints config
-# random: Randomize spawnpoints
+# random = Randomize spawnpoints
 spawn:
-  random: false
+  random: true
 
 # Effects config
-# death-lightning: Strike lightning when a player dies (will not harm)
-# win-fireworks: Launch fireworks at spawnpoint and around winner
-# win-set-night: Set the map to night when win
-# dm-set-night: Set the map to night when deathmatch starts
+# death-lightning = Strike lightning when a game dies (will not harm)
+# win-fireworks = Launch fireworks at spawnpoint and around winner
+# win-set-night = Set the map to night when win
+# dm-set-night = Set the map to night when deathmatch starts
 effects:
   death-lightning: true
   win-fireworks: true
@@ -60,7 +62,7 @@ effects:
   dm-set-night: true
 
 # Setup mode. This will disable matchmaking and enable map creation.
-setup-mode: false
+setup-mode: true
 
 messages:
   # {victim} to show victim

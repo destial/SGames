@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.config.MessageKey;
 import xyz.destiall.sgames.countdown.events.CountdownCallEvent;
+import xyz.destiall.sgames.lobby.events.CancelledStartEvent;
 import xyz.destiall.sgames.lobby.events.ReadyToStartEvent;
 import xyz.destiall.sgames.match.Match;
 import xyz.destiall.sgames.utils.SoundUtils;
@@ -37,6 +38,16 @@ public class MatchListener implements Listener {
     @EventHandler
     public void onReady(ReadyToStartEvent e) {
         String message = SGames.INSTANCE.getConfigManager().getMessage(MessageKey.LOBBY_READY);
+        plugin.getServer().getConsoleSender().sendMessage(message);
+        for (Player player : e.getLobby().queue()) {
+            player.sendMessage(message);
+            player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_LEVER_CLICK, 1, 1);
+        }
+    }
+
+    @EventHandler
+    public void onCancel(CancelledStartEvent e) {
+        String message = SGames.INSTANCE.getConfigManager().getMessage(MessageKey.LOBBY_CANCEL);
         plugin.getServer().getConsoleSender().sendMessage(message);
         for (Player player : e.getLobby().queue()) {
             player.sendMessage(message);

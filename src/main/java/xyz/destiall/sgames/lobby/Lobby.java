@@ -17,6 +17,7 @@ import xyz.destiall.sgames.api.Tickable;
 import xyz.destiall.sgames.config.ConfigKey;
 import xyz.destiall.sgames.countdown.Countdown;
 import xyz.destiall.sgames.countdown.events.CountdownEndEvent;
+import xyz.destiall.sgames.lobby.events.CancelledStartEvent;
 import xyz.destiall.sgames.lobby.events.QueueRemoveEvent;
 import xyz.destiall.sgames.lobby.events.ReadyToStartEvent;
 import xyz.destiall.sgames.match.events.MatchInitEvent;
@@ -77,7 +78,10 @@ public class Lobby implements Module, Listener, Tickable {
         if (queue.containsKey(player)) player.teleport(queue.remove(player));
         scoreboardLobby.removePlayer(player);
         callEvent(new QueueRemoveEvent(this, player));
-        if (!isReady() && isLoaded()) unload();
+        if (!isReady() && isLoaded()) {
+            callEvent(new CancelledStartEvent(this));
+            unload();
+        }
     }
 
     public boolean isReady() {
@@ -102,6 +106,7 @@ public class Lobby implements Module, Listener, Tickable {
 
     @Override
     public void unload() {
+        if (!isLoaded()) return;
         countdown.setContext(Countdown.Context.UNKNOWN);
         HandlerList.unregisterAll(this);
     }

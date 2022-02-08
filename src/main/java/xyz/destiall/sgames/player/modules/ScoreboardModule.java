@@ -1,7 +1,6 @@
 package xyz.destiall.sgames.player.modules;
 
 import fr.mrmicky.fastboard.FastBoard;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -10,8 +9,6 @@ import org.bukkit.event.Listener;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.api.Module;
 import xyz.destiall.sgames.api.Tickable;
-import xyz.destiall.sgames.countdown.Countdown;
-import xyz.destiall.sgames.manager.ConfigManager;
 import xyz.destiall.sgames.match.Match;
 import xyz.destiall.sgames.match.events.MatchMoveEvent;
 import xyz.destiall.sgames.utils.FormatUtils;
@@ -25,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ScoreboardModule implements Module, Tickable, Listener {
     private final ConcurrentHashMap<UUID, FastBoard> boards;
     private final Match match;
-    private Countdown countdown;
     private String title;
     private String[] lines;
 
@@ -81,20 +77,11 @@ public class ScoreboardModule implements Module, Tickable, Listener {
     @Override
     public void tick() {
         String[] lines = Arrays.copyOf(this.lines, this.lines.length);
-        ConfigManager configManager = SGames.INSTANCE.getConfigManager();
         for (FastBoard board : boards.values()) {
             String title = FormatUtils.formatMatchPlayer(this.title, board.getPlayer(), match);
-            if (configManager.PAPI) {
-                title = PlaceholderAPI.setPlaceholders(board.getPlayer(), title);
-            }
-
             for (int i = 0; i < lines.length; i++) {
                 String line = lines[i];
                 line = FormatUtils.formatMatchPlayer(line, board.getPlayer(), match);
-
-                if (configManager.PAPI) {
-                    line = PlaceholderAPI.setPlaceholders(board.getPlayer(), line);
-                }
                 lines[i] = line;
             }
 

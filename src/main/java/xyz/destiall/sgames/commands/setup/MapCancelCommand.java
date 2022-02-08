@@ -1,4 +1,4 @@
-package xyz.destiall.sgames.commands.admin;
+package xyz.destiall.sgames.commands.setup;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

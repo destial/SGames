@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.api.Module;
+import xyz.destiall.sgames.lobby.events.QueueRemoveEvent;
 import xyz.destiall.sgames.map.MapInfo;
 import xyz.destiall.sgames.match.events.MatchInitEvent;
 import xyz.destiall.sgames.utils.TextColorUtils;
@@ -134,6 +135,13 @@ public class VoteManager implements Module, Listener {
             votes.add(uuid);
         }
         return true;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void queueRemove(QueueRemoveEvent e) {
+        for (Set<UUID> votes : votingMaps.values()) {
+            votes.remove(e.getPlayer().getUniqueId());
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

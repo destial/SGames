@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.util.Vector;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.match.Match;
 import xyz.destiall.sgames.player.Competitor;
@@ -134,6 +135,17 @@ public abstract class SGPlayer implements Audience {
         return player != null ? player.getFoodLevel() : 20;
     }
 
+    public Vector getVelocity() {
+        return player != null ? player.getVelocity() : new Vector(0, 0, 0);
+    }
+
+    public void setLevel(int level) {
+        if (player != null) {
+            player.setLevel(level);
+            player.setExp(0);
+        }
+    }
+
     public void kick(String message) {
         if (player != null) {
             player.kickPlayer(message);
@@ -147,6 +159,7 @@ public abstract class SGPlayer implements Audience {
     public void reset() {
         setHealth(20);
         setHunger(20);
+        setLevel(0);
         clearInventory();
         clearEffects();
     }

@@ -4,17 +4,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitTask;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.api.Module;
@@ -36,8 +32,10 @@ import xyz.destiall.sgames.player.Spectator;
 import xyz.destiall.sgames.player.modules.BlockModule;
 import xyz.destiall.sgames.player.modules.BossBarModule;
 import xyz.destiall.sgames.player.modules.DeathModule;
+import xyz.destiall.sgames.player.modules.FireworkModule;
 import xyz.destiall.sgames.player.modules.ScoreboardModule;
 import xyz.destiall.sgames.player.modules.SpectateModule;
+import xyz.destiall.sgames.player.modules.WorldTimeModule;
 import xyz.destiall.sgames.utils.FormatUtils;
 
 import java.time.Duration;
@@ -93,9 +91,14 @@ public class Match implements Module {
         modules.add(new DeathModule(this));
         modules.add(new BlockModule(this));
         modules.add(new BossBarModule(this));
+        modules.add(new WorldTimeModule(this));
 
         if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.BORDER_ENABLED)) {
             modules.add(new BorderModule(this));
+        }
+
+        if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.WIN_FIREWORKS)) {
+            modules.add(new FireworkModule(this));
         }
 
         for (Module module : modules) {
@@ -184,7 +187,7 @@ public class Match implements Module {
     public boolean calculateDMConditions() {
         boolean dm = isRunning() && (competitors.size() <= SGames.INSTANCE.getConfigManager().getInt(ConfigKey.MIN_DEATHMATCH) || countdown.getContext() == Countdown.Context.RUNNING && countdown.getRemaining().isZero());
         if (dm) {
-            countdown.setDuration(Duration.of(30, ChronoUnit.SECONDS));
+            countdown.setDuration(SGames.INSTANCE.getConfigManager().getDuration(ConfigKey.DURATION_STARTING));
 
             if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.DEATHMATCH_NIGHT)) {
                 getWorld().setTime(12000);
@@ -204,26 +207,6 @@ public class Match implements Module {
             winner = FormatUtils.formatMatch(winner, this);
             broadcast(winner);
 
-            if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.WIN_FIREWORKS)) {
-                FireworkEffect effect = FireworkEffect.builder().trail(true).withColor(Color.YELLOW).with(FireworkEffect.Type.STAR).build();
-                for (SpawnPoint sp : map.getPoints()) {
-                    Firework f = getWorld().spawn(sp.getLocation(), Firework.class);
-                    FireworkMeta meta = f.getFireworkMeta();
-                    meta.addEffect(effect);
-                }
-                if (competitors.size() == 1) {
-                    Competitor competitor = getWinner();
-                    for (double theta = -Math.PI; theta <= Math.PI; theta += Math.PI / 6) {
-                        double x = Math.cos(theta);
-                        double z = Math.sin(theta);
-                        Location location = new Location(competitor.getWorld(), x, competitor.getLocation().getBlockY(), z);
-                        Firework f = map.getWorld().spawn(location, Firework.class);
-                        FireworkMeta meta = f.getFireworkMeta();
-                        meta.addEffect(effect);
-                    }
-                }
-            }
-
             if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.WIN_NIGHT)) {
                 getWorld().setTime(12000);
             }
@@ -240,9 +223,6 @@ public class Match implements Module {
         teleport();
         tickTask = SGames.INSTANCE.getScheduler().repeat(() -> {
             for (Tickable tickable : tickables) {
-                if (tickable instanceof Module && !((Module) tickable).isLoaded()) {
-                    ((Module) tickable).load();
-                }
                 tickable.tick();
             }
         }, 1);

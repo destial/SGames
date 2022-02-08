@@ -40,8 +40,9 @@ public class BlockModule implements Module, Listener {
             e.setCancelled(true);
             return;
         }
+
         Block block = e.getBlockPlaced();
-        if (block.getType().name().contains("LEAVES")) return;
+        if (block.getType().name().contains("LEAVES") || block.getType().name().contains("FIRE")) return;
         if (block.getType() == Material.TNT) {
             block.setType(Material.AIR);
             TNTPrimed tnt = block.getWorld().spawn(e.getBlockPlaced().getLocation().add(0.5, 0, 0.5), TNTPrimed.class);
@@ -59,14 +60,13 @@ public class BlockModule implements Module, Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void blockBreak(BlockBreakEvent e) {
+        Block block = e.getBlock();
+        if (breakableBlocks.remove(block)) return;
         e.setDropItems(false);
         e.setExpToDrop(0);
-        Block block = e.getBlock();
-        if (block.getType().name().contains("LEAVES")) return;
-        if (breakableBlocks.remove(block)) return;
+        if (block.getType().name().contains("LEAVES") || block.getType().name().contains("FIRE")) return;
         e.setCancelled(true);
     }
-
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void move(PlayerMoveEvent e) {

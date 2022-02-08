@@ -1,6 +1,8 @@
 package xyz.destiall.sgames.config;
 
 public enum ConfigKey {
+    VERSION("config-version", "1.0.1"),
+
     CHEST_PROBABILITY("chest.probability", 12),
     CHEST_MAX_CONTENTS("chest.max-contents", 6),
     CHEST_MIN_CONTENTS("chest.min-contents", 3),

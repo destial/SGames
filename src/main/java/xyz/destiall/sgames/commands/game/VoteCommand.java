@@ -1,4 +1,4 @@
-package xyz.destiall.sgames.commands.player;
+package xyz.destiall.sgames.commands.game;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -17,6 +17,10 @@ public class VoteCommand extends BaseCommand {
     public void execute(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
+            if (plugin.getMatchManager().getMatch() != null) {
+                player.sendMessage(ChatColor.RED + "You may not vote at this time!");
+                return;
+            }
             if (args.length == 0) {
                 plugin.getMatchManager().getVoteManager().openBook(player, true);
                 return;
@@ -27,7 +31,7 @@ public class VoteCommand extends BaseCommand {
                 return;
             }
             if (!plugin.getMatchManager().getVoteManager().toggleVote(player.getUniqueId(), mapInfo.get())) {
-                player.sendMessage(ChatColor.RED + "You may not vote at this time!");
+                player.sendMessage(ChatColor.RED + "This map is not part of the vote!");
                 return;
             }
             plugin.getMatchManager().getVoteManager().openBook(player, true);

@@ -6,6 +6,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.block.EnderChest;
 import org.bukkit.inventory.Inventory;
 import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.api.SGPlayer;
@@ -19,6 +20,7 @@ public class SGChest {
     private final Inventory inventory;
     private final Random random;
     private final ChestManager chestManager;
+    private boolean opened;
     private Tier tier;
 
     public SGChest(Block block, Inventory inventory) {
@@ -51,17 +53,28 @@ public class SGChest {
     public void open(SGPlayer player) {
         player.openInventory(inventory);
         if (player.isPlaying()) {
-            Chest chest = (Chest) block.getState();
-            chest.open();
-            playSound(true);
+            if (opened) return;
+            if (block.getState() instanceof Chest) {
+                Chest chest = (Chest) block.getState();
+                chest.open();
+            } else {
+                playSound(true);
+            }
+            opened = true;
         }
     }
 
     public void close(SGPlayer player) {
         if (player.isPlaying()) {
-            Chest chest = (Chest) block.getState();
-            chest.close();
-            playSound(false);
+            if (!opened) return;
+            if (block.getState() instanceof Chest) {
+                Chest chest = (Chest) block.getState();
+                chest.close();
+            } else {
+                playSound(false);
+            }
+
+            opened = false;
         }
     }
 

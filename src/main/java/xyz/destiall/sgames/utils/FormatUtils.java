@@ -32,7 +32,7 @@ public class FormatUtils {
 
     public static String formatPlayer(String line, Player player) {
         Location location = player.getLocation();
-        return SGames.INSTANCE.getConfigManager().papi(line.replace("{player}", player.getName())
+        return SGames.INSTANCE.getConfigManager().papi(line.replace("{game}", player.getName())
                 .replace("{health}", "" + player.getHealth())
                 .replace("{hunger}", "" + player.getFoodLevel())
                 .replace("{x}", "" + location.getBlockX())
