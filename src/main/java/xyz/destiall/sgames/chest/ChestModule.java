@@ -19,6 +19,7 @@ import xyz.destiall.sgames.SGames;
 import xyz.destiall.sgames.api.Module;
 import xyz.destiall.sgames.api.SGPlayer;
 import xyz.destiall.sgames.config.ConfigKey;
+import xyz.destiall.sgames.config.MessageKey;
 import xyz.destiall.sgames.match.Match;
 import xyz.destiall.sgames.match.events.DeathmatchEvent;
 
@@ -53,7 +54,10 @@ public class ChestModule implements Module, Listener {
 
     @EventHandler
     public void deathmatch(DeathmatchEvent e) {
-        refillAll();
+        if (SGames.INSTANCE.getConfigManager().getBoolean(ConfigKey.CHEST_REFILL_DEATHMATCH)) {
+            refillAll();
+            match.broadcast(SGames.INSTANCE.getConfigManager().getMessage(MessageKey.REFILL));
+        }
     }
 
     @EventHandler

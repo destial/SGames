@@ -3,6 +3,7 @@ package xyz.destiall.sgames.config;
 public enum MessageKey {
     LOBBY_READY("messages.ready", "&aThe game is ready!"),
     LOBBY_CANCEL("messages.cancel", "&cThe start has been cancelled!"),
+    REFILL("messages.refill", "&eAll chests have been refilled!"),
     KILL("messages.kill", "&6A cannon could be heard in the distance."),
     DIED("messages.died", "&cYou died!"),
     STARTING("messages.starting" ,"&aThe game is starting in {time}"),

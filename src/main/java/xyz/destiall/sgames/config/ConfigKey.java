@@ -1,12 +1,13 @@
 package xyz.destiall.sgames.config;
 
 public enum ConfigKey {
-    VERSION("config-version", "1.0.1"),
+    VERSION("config-version", "1.0.2"),
 
     CHEST_PROBABILITY("chest.probability", 12),
     CHEST_MAX_CONTENTS("chest.max-contents", 6),
     CHEST_MIN_CONTENTS("chest.min-contents", 3),
     CHEST_KEEP_OPEN("chest.keep-open", false),
+    CHEST_REFILL_DEATHMATCH("chest.refill-deathmatch", true),
 
     MIN_PLAYERS("players.min-players", 3),
     MAX_PLAYERS("players.max-players", 24),

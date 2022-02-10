@@ -34,50 +34,53 @@ public class ConfigManager {
 
     public boolean getBoolean(ConfigKey key) {
         if (!configuration.contains(key.key)) {
-            configuration.set(key.key, key.def);
-            save();
+            noKey(key);
         }
         return configuration.getBoolean(key.key, (boolean) key.def);
     }
 
     public String getString(ConfigKey key) {
         if (!configuration.contains(key.key)) {
-            configuration.set(key.key, key.def);
-            save();
+            noKey(key);
         }
         return configuration.getString(key.key, (String) key.def);
     }
 
     public String getMessage(MessageKey key) {
-        if (!configuration.contains(key.key)) {
-            configuration.set(key.key, key.def);
-            save();
-        }
         return ChatColor.translateAlternateColorCodes('&', configuration.getString(key.key, key.def));
     }
 
     public int getInt(ConfigKey key) {
         if (!configuration.contains(key.key)) {
-            configuration.set(key.key, key.def);
-            save();
+            noKey(key);
         }
         return configuration.getInt(key.key, (int) key.def);
     }
 
     public double getDouble(ConfigKey key) {
         if (!configuration.contains(key.key)) {
-            configuration.set(key.key, key.def);
-            save();
+            noKey(key);
         }
         return configuration.getDouble(key.key, (double) key.def);
     }
 
     public float getFloat(ConfigKey key) {
         if (!configuration.contains(key.key)) {
-            configuration.set(key.key, key.def);
-            save();
+            noKey(key);
         }
         return (float) getDouble(key);
+    }
+
+    public void noKey(ConfigKey key) {
+        SGames.INSTANCE.getLogger().warning("Configuration key " + key.key + " not found! Using default: " + key.def);
+        configuration.set(key.key, key.def);
+        save();
+    }
+
+    public void noKey(MessageKey key) {
+        SGames.INSTANCE.getLogger().warning("Message key " + key.key + " not found! Using default: " + key.def);
+        configuration.set(key.key, key.def);
+        save();
     }
 
     public void save() {
